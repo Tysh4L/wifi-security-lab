@@ -116,7 +116,7 @@ The `STATION` section shows wireless client devices observed communicating with 
 
 At this point, the tablet used as the test client was connected to the Wi-Fi network and actively using the connection.
 
-![Test tablet connected to the wireless network](screenshots/08-tablet-connected.png)
+![Test tablet connected to the wireless network](screenshots/08-tablet-connected.jpg)
 ## 4. Directed Deauthentication Test
 
 After identifying the test tablet in the `STATION` list, I performed a directed deauthentication test against that client.
@@ -166,11 +166,11 @@ After the test had been running for a short period, the tablet lost its connecti
 
 Because another saved Wi-Fi network was available, the tablet automatically connected to the 5 GHz network instead.
 
-![Tablet automatically connected to another Wi-Fi network](screenshots/12-client-disconnected-from-target-network.png)
+![Tablet automatically connected to another Wi-Fi network](screenshots/12-client-disconnected-from-target-network.jpg)
 
 I then attempted to reconnect the tablet to the original 2.4 GHz network.
 
-![Tablet attempting to reconnect to the test network](screenshots/13-client-reconnection-attempt.png)
+![Tablet attempting to reconnect to the test network](screenshots/13-client-reconnection-attempt.jpg)
 ## 5. MAC Address Randomization Observation
 
 After reconnecting the tablet to the original Wi-Fi network, the device appeared in `airodump-ng` with a different client MAC address.
@@ -181,7 +181,7 @@ Instead of reusing the same client MAC address that had been targeted by `airepl
 
 As a result, the deauthentication command that was still running continued targeting the previous client address, while the tablet was now communicating with the access point using a new randomized MAC address.
 
-![Randomized MAC address enabled on the test tablet](screenshots/14-randomized-mac-enabled.png)
+![Randomized MAC address enabled on the test tablet](screenshots/14-randomized-mac-enabled.jpg)
 
 The change was also visible from the monitoring system, where the tablet appeared as a new `STATION` with a different MAC address.
 
@@ -201,7 +201,7 @@ To compare the behavior, I changed the tablet Wi-Fi privacy setting from a rando
 
 This allowed the tablet to connect using its hardware MAC address instead of a temporary randomized address.
 
-![Changing the tablet from Randomized MAC to Tablet MAC](screenshots/16-switch-to-device-mac.png)
+![Changing the tablet from Randomized MAC to Tablet MAC](screenshots/16-switch-to-device-mac.jpg)
 
 Once the tablet reconnected, `airodump-ng` showed a new station using the device MAC address.
 
@@ -219,7 +219,7 @@ While the test was running, the Lost value for the station increased and the tab
 
 The tablet was unable to reconnect successfully while the continuous deauthentication test was still running.
 
-![Wi-Fi connection failure while the test was running](screenshots/19-connection-failed.png)
+![Wi-Fi connection failure while the test was running](screenshots/19-connection-failed.jpg)
 
 ## 7. Ending the Test and Restoring Connectivity
 
@@ -227,11 +227,12 @@ After stopping the continuous deauthentication test, the tablet was able to conn
 
 This confirmed that the connectivity problem was caused by the active deauthentication test rather than by a permanent configuration issue.
 
-![Tablet reconnected after stopping the deauthentication test](screenshots/20-connectivity-restored.png)
+![Tablet reconnected after stopping the deauthentication test](screenshots/20-connectivity-restored.jpg)
 
 For privacy, I changed the tablet back to using a randomized MAC address after completing the test.
 
-![Randomized MAC address restored on the tablet](screenshots/21-randomized-mac-restored.png)
+![Randomized MAC address restored on the tablet](screenshots/21-randomized-mac-restored.jpg)
+
 ### Disabling Monitor Mode
 
 After completing the wireless test, I disabled Monitor mode:
