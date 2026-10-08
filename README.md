@@ -183,7 +183,7 @@ As a result, the deauthentication command that was still running continued targe
 
 ![Randomized MAC address enabled on the test tablet](screenshots/14-randomized-mac-enabled.jpg)
 
-The change was also visible from the monitoring system, where the tablet appeared as a new `STATION` with a different MAC address.
+The change was also visible while monitoring the selected network with `airodump-ng`, where the tablet appeared as a new `STATION` with a different MAC address.
 
 ![Tablet appearing as a new station with a randomized MAC address](screenshots/15-new-randomized-station.png)
 
