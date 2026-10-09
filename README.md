@@ -1,5 +1,10 @@
 # Wi-Fi Security Lab
 
+![Linux](https://img.shields.io/badge/Linux-Garuda-blue)
+![Aircrack-ng](https://img.shields.io/badge/Aircrack--ng-Wireless%20Security-orange)
+![Wi-Fi](https://img.shields.io/badge/Wi--Fi-802.11-purple)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
+
 ## Overview
 
 This project documents a controlled Wi-Fi security lab performed on my own wireless network and personal tablet.
@@ -144,13 +149,22 @@ While `aireplay-ng` was running, the terminal repeatedly displayed output simila
 ```
 Sending 64 directed DeAuth (code 7). STMAC: [CLIENT_MAC] [17|64 ACKs]
 ```
-
 The output provides information about the transmitted deauthentication frames:
 
-- Directed DeAuth indicates that the frames are being sent to a specific client station.
-- code 7 is the 802.11 reason code used in the generated deauthentication frames.
-- STMAC identifies the target station MAC address.
-- The ACK values indicate acknowledgements observed from the client and access point during transmission.
+- 64 directed DeAuth — aireplay-ng is sending a burst of 64 deauthentication frames directed at a specific client.
+- code 7 — this is the IEEE 802.11 reason code included in the deauthentication frame. Reason code 7 indicates that a Class 3 frame was received from a station that is considered not associated with the access point.
+- STMAC — identifies the MAC address of the target station.
+- [17|64 ACKs] — shows acknowledgements received during the transmission:
+  - 17 ACKs from the client station
+  - 64 ACKs from the access point
+
+An `ACK` (Acknowledgment) in this context refers to the IEEE 802.11 acknowledgment mechanism, not the TCP ACK flag. IEEE 802.11 defines `Ack` as a subtype of Control frame and specifies that, when acknowledgment is required, the addressed recipient returns an Ack frame after a Short Interframe Space (SIFS).
+
+These values help indicate whether the client and the access point are receiving the transmitted frames.
+
+## References
+
+- IEEE Std 802.11-2024, *IEEE Standard for Information Technology—Local and Metropolitan Area Networks—Specific Requirements—Part 11: Wireless LAN Medium Access Control (MAC) and Physical Layer (PHY) Specifications*, Table 9-1 and Table 9-13.
 
 ![Deauthentication traffic in progress](screenshots/10-deauth-in-progress.png)
 
@@ -289,3 +303,7 @@ This project was performed exclusively in a controlled environment using my own 
 The purpose of this lab was educational: to understand wireless monitoring, 802.11 client behavior, MAC address randomization, and deauthentication behavior using the Aircrack-ng suite.
 
 No third-party networks or devices were intentionally targeted.
+
+---
+
+⋆⁺₊⋆ 🐰 **tysh4l** ── *Wi-Fi security lab [2026]* ── ✦ 2026 ⋆⁺₊⋆ 
