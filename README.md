@@ -7,13 +7,17 @@
 
 ## Overview
 
-This project documents a controlled Wi-Fi security lab performed on my own wireless network and personal tablet.
+This project documents a controlled Wi-Fi security lab performed on my own wireless network and personal devices using the Aircrack-ng suite.
 
-The main objective was to explore basic 802.11 wireless monitoring concepts using the Aircrack-ng suite, including monitor mode, access point discovery, station identification, signal observation, and directed deauthentication testing.
+The lab focused on practical IEEE 802.11 wireless analysis, including monitor mode, access point and station discovery, directed deauthentication testing, frame injection, MAC address behavior, and interpretation of deauthentication and acknowledgment traffic.
 
-During the lab, I also observed how MAC address randomization can affect client identification and how the behavior changes when the device uses its hardware MAC address.
+As part of the analysis, I investigated how IEEE 802.11 classifies **Deauthentication** as a Management frame and **Ack** as a Control frame, how reason codes are used in deauthentication frames, and how `aireplay-ng` injects crafted frames toward both sides of a wireless connection.
 
-> All testing was performed only on devices and networks under my control.
+The experiment also demonstrated how MAC address randomization can affect client identification during testing. When the device reconnected using a different randomized MAC address, the original directed deauthentication process continued targeting the previous station address. Repeating the test with the device MAC provided a useful comparison between a changing client identifier and a stable one.
+
+The project combines practical testing, command-line observations, packet-level concepts, and references to IEEE 802.11, Aircrack-ng documentation, and academic research.
+
+> All testing was performed exclusively on devices and networks under my control.
 
 ## Lab Environment
 
@@ -109,9 +113,9 @@ sudo airodump-ng -c 10 --bssid <AP_BSSID> wlp4s0mon
 
 In this command:
 
-- -c 10 specifies the channel used by the access point.
-- --bssid <AP_BSSID> filters the capture to the selected access point.
-- wlp4s0mon is the wireless interface operating in Monitor mode.
+- `-c 10` specifies the channel used by the access point.
+- `--bssid` <AP_BSSID> filters the capture to the selected access point.
+- `wlp4s0mon` is the wireless interface operating in Monitor mode.
 
 This made it easier to observe only the traffic and stations associated with the test network.
 
@@ -126,8 +130,6 @@ At this point, the tablet used as the test client was connected to the Wi-Fi net
 ## 4. Directed Deauthentication Test
 
 After identifying the test tablet in the `STATION` list, I performed a directed deauthentication test against that client.
-
-The test was performed only on my own access point and personal tablet.
 
 ### What is a Deauthentication Frame?
 
@@ -172,11 +174,11 @@ sudo aireplay-ng -0 0 -a <AP_BSSID> -c <CLIENT_MAC> wlp4s0mon
 
 In this command:
 
-- -0 selects deauthentication mode.
-- 0 sends deauthentication frames continuously until the command is stopped manually.
-- -a <AP_BSSID> specifies the BSSID of the access point.
-- -c <CLIENT_MAC> specifies the target client station.
-- wlp4s0mon is the wireless interface in Monitor mode.
+- `-0` selects deauthentication mode.
+- `0` sends deauthentication frames continuously until the command is stopped manually.
+- `-a <AP_BSSID>` specifies the BSSID of the access point.
+- `-c <CLIENT_MAC>` specifies the target client station.
+- `wlp4s0mon` is the wireless interface in Monitor mode.
 
 ![Directed deauthentication command](screenshots/09-deauth-command.png)
 
@@ -193,7 +195,7 @@ The output provides information about the transmitted deauthentication frames:
 - `64 directed DeAuth` — `aireplay-ng` is transmitting a burst of 64 deauthentication frames as part of the directed deauthentication test.
 - ``code 7`` — IEEE 802.11 reason code 7 (`INVALID_CLASS3_FRAME`), meaning that a Class 3 frame was received from a station considered not associated with the access point.
 - `STMAC` — identifies the MAC address of the target station.
-- [17|64 ACKs] — shows acknowledgements received during the transmission:
+- `[17|64 ACKs]` — shows acknowledgements received during the transmission:
   - `17` ACKs from the client station
   - `64` ACKs from the access point
 
@@ -208,11 +210,6 @@ An `ACK` (Acknowledgment) in this context refers to the IEEE 802.11 acknowledgme
 
 IEEE 802.11 defines `Ack` as a subtype of **Control frame** and specifies that, when acknowledgment is required, the addressed recipient returns an Ack frame after a Short Interframe Space (SIFS).
 
-In the `aireplay-ng` output:
-
-```text
-[client ACKs | AP ACKs]
-```
 
 > **Note:** This is a simplified view showing only the IEEE 802.11 frame types and subtypes discussed in this lab. The standard defines additional frame types and subtypes that are not shown here.
 ```mermaid
@@ -339,15 +336,20 @@ The wireless interface was back in **Managed mode**, confirming that the system 
 
 ## 8. Key Findings
 
-This lab helped me understand several practical aspects of 802.11 wireless security:
+This lab provided several practical observations about IEEE 802.11 wireless behavior and directed deauthentication testing:
 
-- Monitor mode allows a wireless adapter to observe nearby 802.11 traffic without being connected to an access point.
-- `airodump-ng` can be used to identify access points, channels, signal strength, and observed client stations.
-- A directed deauthentication test can temporarily disrupt communication between an access point and a specific client.
-- The `Lost` value in `airodump-ng` can help indicate communication problems while the test is running.
-- MAC address randomization can make the same physical device appear as a different station after reconnecting.
-- A deauthentication process targeting an old randomized MAC address will not automatically follow the device when it reconnects using a different MAC address.
-- Using the device MAC allowed me to observe the difference between a changing client identifier and a stable one.
+- Monitor mode allows a compatible wireless adapter to observe nearby IEEE 802.11 traffic without operating as a normally associated client.
+- `airodump-ng` can be used to identify access points, channels, signal strength, encryption information, and observed client stations.
+- IEEE 802.11 defines **Deauthentication** as a Management frame subtype used to terminate an authentication relationship. Because authentication is required for association, deauthentication also causes the affected station to become disassociated.
+- Deauthentication frames contain a **Reason Code**. In this test, `aireplay-ng` generated frames using reason code 7 (`INVALID_CLASS3_FRAME`), corresponding to a Class 3 frame received from a nonassociated station.
+- `aireplay-ng` performs **802.11 frame injection** during the directed deauthentication test. The injected frames use forged addressing information associated with the legitimate AP/client relationship, while the actual radio transmission originates from the testing wireless adapter.
+- A directed deauthentication involves traffic toward both the access point and the client. Aircrack-ng documents 64 packets toward each side for each specified directed deauthentication, for a total of 128 packets.
+- The ACK values displayed by `aireplay-ng` refer to IEEE 802.11 acknowledgments, not the TCP ACK flag. IEEE 802.11 classifies `Ack` as a Control frame subtype.
+- The increasing `Lost` value observed in `airodump-ng` provided an additional indication that communication between the client and access point was being disrupted during the test.
+- MAC address randomization can cause the same physical device to appear as a different station after reconnecting.
+- Because `aireplay-ng` targets a specific client MAC address, a process targeting an old randomized MAC does not automatically follow the device if it reconnects using a different address.
+- Repeating the test with the tablet's device MAC demonstrated the difference between targeting a temporary client identifier and a stable one.
+- Management Frame Protection (PMF) is relevant to deauthentication security because IEEE 802.11 classifies Deauthentication as a robust Management frame that can be protected when PMF is negotiated.
 
 ## Disclaimer
 
